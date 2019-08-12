@@ -1,132 +1,68 @@
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Core
 {
-    public static void main(String args[]) throws IOException
+    public static POST post=null;
+    public static void main(String args[]) throws InterruptedException, IOException
     {
-        System.out.println(get("https://ranobes.com/chapters/warlock-of-the-magus-world/8902-glava-789-rozhdenie.html"));
+        String data,name,token="pBKvhCZH4nw9WfwcRXVUd1qKrt2gnRbc9XqXUHDB",
+                mangaSesion="eyJpdiI6Ik5iWjN3bmgzVG5SNlFSRm1GM0pcL1BRPT0iLCJ2YWx1ZSI6ImtFbHIrTTlYT1R1S1g5cEZLYUt2d3JDeUZDUjd2d01FdE9OYlJjUGdXcmplUDNtRWNVK0F4RHk2Q1wvRWtLV1MwIiwibWFjIjoiODk5YWZlN2MzN2Q4ZmIzMmRmMzQ4NmQ1YTc3NDMwNzE4MjgxNzQ2M2NhMGYwYzY0YTk4ZDk2OGIzNzU5MjlhMSJ9",
+                XToken="eyJpdiI6Ijk3NjZnYW0zU293R09MZG5McjNjeFE9PSIsInZhbHVlIjoiQ3ArVDVnWEFJRGJadDFvd01mN3hRZWZFTkFKRDIxRWgySVhOdWQxTTZTbDNMTEVmQzhIdHpDRVpZK2FJb3c5SSIsIm1hYyI6IjI2OGY1MDk0YTU0OTdjODI3OGNjOGY1MmM5NmUyN2NiNzU1ZGRmZDc2ZmFhZGE1ODk0ZTJhNmMyODg2MzgyMWIifQ%3D%3D";
+        init("6967",XToken,mangaSesion);
+        Scanner namae=null;
+        try{
+            namae=new Scanner(new File("names"));
+            short index=821;
         
-//        int cx=978;
-//        ArrayList<String>a=getLink();
-//        for(String b:a)
-//        {
-//            saveText(get(b), cx+"");
-//            cx++;
-//        }
-    }
-    public static void buildName() throws IOException
-    {
-        File f=new File("names");
-        if(!f.exists())
-            f.createNewFile();
-        ArrayList<String>url=(ArrayList<String>) Files.readAllLines(new File("url").toPath());
-        FileWriter out=new FileWriter(f);
-        int cx=0;
-        while(cx<url.size())
-        {
-            String a=findName(url.get(cx++))+'\n';
-            System.out.print(a);
-            out.write(a);
-        }
-        out.close();
-    }
-    public static String findName(String urlString) throws IOException
-    {
-        StringBuilder sb=new StringBuilder();
-        URLConnection url=new URL(urlString).openConnection();
-        url.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64)");
-        InputStreamReader in=new InputStreamReader(url.getInputStream(), Charset.forName("UTF8"));
-        in.skip(74);
-        char[]src="Оглавление".toCharArray();
-        short cx=0;
-        char inChar;
-        while((inChar=(char) in.read())!=':'){}
-        in.read();
-        while((inChar=(char)in.read())!='|')
-            sb.append(inChar);
-        in.close();
-        return sb.toString();
-    }
-    public static void buildList(String startUrl,int count) throws IOException
-    {
-        File f=new File("url");
-        if(!f.exists())
-            f.createNewFile();
-        FileWriter out=new FileWriter(f);
-        String curUrl=startUrl;
-        out.write(curUrl+'\n');
-        while(count-->0)
-        {
-            curUrl=findNext(curUrl);
-            out.write(curUrl+'\n');
-            System.out.println(curUrl);
-        }
-        out.close();
-    }
-    public static String findNext(String urlString) throws IOException
-    {
-        StringBuilder sb=new StringBuilder();
-        URLConnection url=new URL(urlString).openConnection();
-        url.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64)");
-        InputStreamReader in=new InputStreamReader(url.getInputStream(), Charset.forName("UTF8"));
-        char[]src="Оглавление".toCharArray();
-        short cx=0;
-        char inChar;
-        while((inChar=(char) in.read())!='\uffff')
-        {
-            if(inChar==src[cx++])
+            while(index<=850)
             {
-                if(cx==src.length)
-                    break;
-            }else{
-                cx=0;
+            data=URLEncoder.encode(Util.readFile(index+""), "UTF8");
+            name=URLEncoder.encode(namae.nextLine(), "UTF8");
+            System.out.println(index);
+            send(token, 1, index, name, data, "6967");
+            index++;
+            Thread.sleep(1000);
             }
+        }catch(IOException e){
+            System.out.println(e);
+        }finally{
+            namae.close();
         }
-        in.skip(13);
-        while((inChar=(char)in.read())!='\"')
-            sb.append(inChar);
-        in.close();
-        return sb.toString();
     }
-    public static ArrayList<String> getLink() throws FileNotFoundException, IOException
+    public static void getTexts(short start,short end) throws IOException
     {
-        ArrayList<String> list=new ArrayList<>();
-        FileReader in=new FileReader(new File("link"));
-        StringBuilder sb=new StringBuilder();
-        char inChar;
-        sb=new StringBuilder();
-        while((inChar=(char)in.read())!='\uffff')
+        Scanner link=new Scanner(new File("link"));
+        
+        short cx=start;
+        while(cx<=end)
         {
-            if(inChar!='\n')
-                sb.append(inChar);
-            else
-            {
-                list.add(sb.toString());
-                sb=new StringBuilder();
-            }
+            Util.saveFile(get(link.nextLine()), cx+"");
+            System.out.println(cx);
+            cx++;
         }
-        in.close();
-        return list;
-    }
-    public static void saveText(String text,String name) throws IOException
+    }//Download all text file from list 'link'
+    public static void init(String id,String XToken,String session)
     {
-        File f=new File("dat\\"+name+".txt");
-        if(!f.exists())
-            f.createNewFile();
-        FileWriter out=new FileWriter(f);
-        out.write(text);
-        out.close();
-    }
+        post=new POST("https://ranobelib.me/admin/manga/"+id+"/chapter");
+        post.setCookie("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0");
+        post.setCookie("Content-Type","application/x-www-form-urlencoded");
+//        post.setCookie("X-CSRF-TOKEN",token[0]);
+        post.setCookie("X-Requested-With", "XMLHttpRequest");
+        post.setCookie("X-XSRF-TOKEN", XToken);
+        post.setCookie("Cookie", "mangalib_session="+session);
+    }//Init POST
+    public static void send(String token,int volume,int num,String name,String data,String mangaId)
+    {
+        post.sendData("_token="+token+"&volume="+volume+"&number="+num+"&scanlator_id=0&name="+name+"&content="+data+"&mangaId="+mangaId);
+    }//send mes to POST
     public static String get(String urlString) throws IOException
     {
         StringBuilder sb=new StringBuilder();
@@ -148,23 +84,7 @@ public class Core
         }
         in.close();
         String ret=sb.toString();
-//        ret=ret.replace("<p>", "");
-//        ret=ret.replace("</p>", "");
         ret=ret.replace("<br/>", "\n");
-//        sb=new StringBuilder();
-//        int i1=0,i2=0;
-//        i1=ret.indexOf("<");
-//        i2=ret.lastIndexOf(">");
-//        if(i1!=-1&&i2!=-1)
-//        {
-//            i2++;
-//            sb.append(ret.substring(0, i1));
-//            sb.append(ret.substring(i2, ret.length()));
-//            return sb.toString();
-//        }else{
-//            System.out.println(ret);
-//            return ret;
-//        }
-        return ret;
-    }
+        return Util.deleteTag(Util.deleteTag(ret, "ins"), "script");
+    }//Get text from current link
 }
