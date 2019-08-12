@@ -13,10 +13,10 @@ public class Core
     public static POST post=null;
     public static void main(String args[]) throws InterruptedException, IOException
     {
-        String data,name,token="pBKvhCZH4nw9WfwcRXVUd1qKrt2gnRbc9XqXUHDB",
-                mangaSesion="eyJpdiI6Ik5iWjN3bmgzVG5SNlFSRm1GM0pcL1BRPT0iLCJ2YWx1ZSI6ImtFbHIrTTlYT1R1S1g5cEZLYUt2d3JDeUZDUjd2d01FdE9OYlJjUGdXcmplUDNtRWNVK0F4RHk2Q1wvRWtLV1MwIiwibWFjIjoiODk5YWZlN2MzN2Q4ZmIzMmRmMzQ4NmQ1YTc3NDMwNzE4MjgxNzQ2M2NhMGYwYzY0YTk4ZDk2OGIzNzU5MjlhMSJ9",
-                XToken="eyJpdiI6Ijk3NjZnYW0zU293R09MZG5McjNjeFE9PSIsInZhbHVlIjoiQ3ArVDVnWEFJRGJadDFvd01mN3hRZWZFTkFKRDIxRWgySVhOdWQxTTZTbDNMTEVmQzhIdHpDRVpZK2FJb3c5SSIsIm1hYyI6IjI2OGY1MDk0YTU0OTdjODI3OGNjOGY1MmM5NmUyN2NiNzU1ZGRmZDc2ZmFhZGE1ODk0ZTJhNmMyODg2MzgyMWIifQ%3D%3D";
-        init("6967",XToken,mangaSesion);
+        String data,name,token="???",mangaNum="???"
+                mangaSesion="???",
+                XToken="???";
+        init(mangaNum,XToken,mangaSesion);
         Scanner namae=null;
         try{
             namae=new Scanner(new File("names"));
@@ -27,7 +27,7 @@ public class Core
             data=URLEncoder.encode(Util.readFile(index+""), "UTF8");
             name=URLEncoder.encode(namae.nextLine(), "UTF8");
             System.out.println(index);
-            send(token, 1, index, name, data, "6967");
+            send(token, 1, index, name, data, mangaNum);
             index++;
             Thread.sleep(1000);
             }
