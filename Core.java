@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,20 +7,55 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class Core
 {
     public static void main(String args[]) throws IOException
     {
-        buildList("https://ranobes.com/chapters/warlock-of-the-magus-world/8863-glava-750-ozero-polumesjaca.html", 100);
-//        int cx=737;
+        System.out.println(get("https://ranobes.com/chapters/warlock-of-the-magus-world/8902-glava-789-rozhdenie.html"));
+        
+//        int cx=978;
 //        ArrayList<String>a=getLink();
 //        for(String b:a)
 //        {
 //            saveText(get(b), cx+"");
 //            cx++;
 //        }
+    }
+    public static void buildName() throws IOException
+    {
+        File f=new File("names");
+        if(!f.exists())
+            f.createNewFile();
+        ArrayList<String>url=(ArrayList<String>) Files.readAllLines(new File("url").toPath());
+        FileWriter out=new FileWriter(f);
+        int cx=0;
+        while(cx<url.size())
+        {
+            String a=findName(url.get(cx++))+'\n';
+            System.out.print(a);
+            out.write(a);
+        }
+        out.close();
+    }
+    public static String findName(String urlString) throws IOException
+    {
+        StringBuilder sb=new StringBuilder();
+        URLConnection url=new URL(urlString).openConnection();
+        url.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64)");
+        InputStreamReader in=new InputStreamReader(url.getInputStream(), Charset.forName("UTF8"));
+        in.skip(74);
+        char[]src="Оглавление".toCharArray();
+        short cx=0;
+        char inChar;
+        while((inChar=(char) in.read())!=':'){}
+        in.read();
+        while((inChar=(char)in.read())!='|')
+            sb.append(inChar);
+        in.close();
+        return sb.toString();
     }
     public static void buildList(String startUrl,int count) throws IOException
     {
@@ -100,13 +134,12 @@ public class Core
         
         url.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64)");
         InputStreamReader in=new InputStreamReader(url.getInputStream(), Charset.forName("UTF8"));
-        short cx=117;
+        short cx=115;
         char inChar;
         while(cx--!=0)
         {
             while((inChar=(char)in.read())!='\n'){}
         }
-        in.skip(69);
         cx=2;
         while(cx--!=0)
         {
@@ -115,9 +148,23 @@ public class Core
         }
         in.close();
         String ret=sb.toString();
-        ret=ret.replace("<p>", "");
-        ret=ret.replace("</p>", "");
+//        ret=ret.replace("<p>", "");
+//        ret=ret.replace("</p>", "");
         ret=ret.replace("<br/>", "\n");
+//        sb=new StringBuilder();
+//        int i1=0,i2=0;
+//        i1=ret.indexOf("<");
+//        i2=ret.lastIndexOf(">");
+//        if(i1!=-1&&i2!=-1)
+//        {
+//            i2++;
+//            sb.append(ret.substring(0, i1));
+//            sb.append(ret.substring(i2, ret.length()));
+//            return sb.toString();
+//        }else{
+//            System.out.println(ret);
+//            return ret;
+//        }
         return ret;
     }
 }
